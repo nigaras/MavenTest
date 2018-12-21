@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.asurion</groupId>
+    <artifactId>MavenTest</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <url>http://maven.apache.org</url>
+    <name>Child Pom File</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+        <maven.compile.encoding>UTF-8</maven.compile.encoding>
+    </properties>
+
+    <dependencies>
+        <!-- ***********  https://mvnrepository.com/artifact/info.cukes/cucumber-core  ******** -->
+        <!-- ************** Adding cucumber related all dependencies in below ***************** -->
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>1.2.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-jvm</artifactId>
+            <version>1.2.5</version>
+            <type>pom</type>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/info.cukes/cucumber-junit -->
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>1.2.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-jvm-deps</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+        <!--  Cucumber Gherkin SYNTAX -->
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>gherkin</artifactId>
+            <version>2.12.2</version>
+        </dependency>
+        <!-- 2nd is for Cucumber pretty and Json format Reporting -->
+        <dependency>
+            <groupId>net.masterthought</groupId>
+            <artifactId>cucumber-reporting</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- **************************************************************************************** -->
+    <!-- ********************** adding surefire and compiler plugin ******************************** -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <fork>true</fork>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <!-- **************************************************************************************** -->
+            <!-- The Surefire Plugin is used during the test phase of the build lifecycle to execute
+            the unit tests of an application.It generates reports in two different file formats:
+            1.XML files
+            2.Plain Text files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+                    <includes>
+                        <include>**/Parallel*IT.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.20</version>
+            </plugin>
+
+            <!-- **************************************************************************************** -->
+            <!-- ******************maven cucumber HTML reporting plugin *************************** -->
+            <plugin>
+                <groupId>net.masterthought</groupId>
+                <artifactId>maven-cucumber-reporting</artifactId>
+                <version>3.16.0</version>
+                <executions>
+                    <execution>
+                        <id>execution</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <projectName>AutoRunner_Cucumber</projectName>
+                            <outputDirectory>${project.build.directory}/reports/cucumber-reports</outputDirectory>
+                            <cucumberOutput>target/cucumber-parallel/json</cucumberOutput>
+                            <buildNumber>42</buildNumber>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- **************************************************************************************** -->
+            <!--  **https://mvnrepository.com/artifact/com.github.temyers/cucumber-jvm-parallel-plugin ** -->
+            <plugin>
+                <groupId>com.github.temyers</groupId>
+                <artifactId>cucumber-jvm-parallel-plugin</artifactId>
+                <version>5.0.0</version>
+                <executions>
+                    <execution>
+                        <id>generateRunners</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>generateRunners</goal>
+                        </goals>
+                        <configuration>
+                            <glue>
+                                <package>stepDefinition</package>
+                            </glue>
+                            <outputDirectory>src/test/java/autoGenerateRunner</outputDirectory> <!-- runner will generate here -->
+                            <featuresDirectory>src/test/resources/features/</featuresDirectory><!--Cucumber feature file location-->
+                            <cucumberOutputDir>target/cucumber-parallel</cucumberOutputDir><!--Cucumber default reporting path-->
+                            <plugins>
+                                <plugin>
+                                    <!--The available options are junit, testng, html, pretty, json, usage and rerun -->
+                                    <name>json</name>
+                                    <extension>json</extension>
+                                    <!--Optional output directory. Overrides cucumberOutputDirectory. Usefull when different plugins create files with the same extension-->
+                                    <outputDirectory>${project.build.directory}/cucumber-parallel/json/</outputDirectory>
+                                </plugin>
+                            </plugins>
+                            <strict>true</strict>
+                            <monochrome>true</monochrome>
+                            <tags>
+                                <tag>@AddNumbers</tag>
+                                <!--Currently multiple tags not working-->
+                            </tags>
+                            <useTestNG>false</useTestNG>
+                            <!-- The naming scheme to use for the generated test classes.  One of ['simple', 'feature-title', 'pattern'] -->
+                            <namingScheme>simple</namingScheme>
+                            <!-- The class naming pattern to use.  Only required/used if naming scheme is 'pattern'.-->
+                            <namingPattern>Parallel{c}IT</namingPattern>
+                            <!-- One of [SCENARIO, FEATURE]. SCENARIO generates one runner per scenario.  FEATURE generates a runner per feature. -->
+                            <parallelScheme>SCENARIO</parallelScheme>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <!--  ******************  Build Plugin added  **************** -->
+</project>
